@@ -1,0 +1,62 @@
+
+class FetchForm {
+
+    /** @type {string} */
+    #endpoint
+    /** @type {HTMLTemplateElement} */
+    #template
+    /** @type {HTMLElement} */
+    #target
+    /** @type {Object} */
+    #elements
+
+    /**
+     * 
+     * @param {HTMLFormElement} element
+     */
+    constructor(form) {
+        this.#endpoint = form.dataset.endpoint
+        this.#template = document.queryselector(form.dataset.template)
+        this.#target = document.queryselector(form.dataset.target)
+        this.#elements = JSON.parse(form.dataset.elements)
+        form.addEventListener('submit', e => {
+            e.preventDefault()
+            this.#submitForm(e.currentTarget)
+        })
+    }
+
+    /**
+     * 
+     * @param {HTMLFormElement} form
+     */
+    async #submitForm (form) {
+        const button = form.querySelector('button')
+        button.setAttribute('disabled', '')
+        try {
+            const data = new FormData(form)
+            const comment = await fetchJSON(this.#endpoint, {
+                method: 'POST',
+                json: Object.fromEntries(data)
+        })
+
+        const commentElement = this.#template.content.cloneNode(true)
+        for (const [key, selector] of Object.entries(this.#elements)) {
+            commentElement.querySelector(selector).innerText = comment[key]
+        }
+        this.#target.prepend(commentElement)
+        form.reset()
+        button.removeAttribute('disabled')
+        } catch (e) {
+
+        }
+    }
+
+}
+
+document
+    .querySelectorAll('.js-infinite.pagination')
+    .forEach(el => new Infinite-pagination(el))
+
+    document
+    .querySelectorAll('.js-form-fetch')
+    .forEach(form => new FetchForm(form))
